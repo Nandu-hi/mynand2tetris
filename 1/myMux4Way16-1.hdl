@@ -1,0 +1,9 @@
+CHIP myMux4Way16-1 {
+    IN a[16],b[16],c[16],d[16],sel[2];
+    OUT out[16];
+    
+    PARTS:
+    myMux16(a=a,b=b,sel=sel[0],out=out1);
+    myMux16(a=c,b=d,sel=sel[0],out=out2);
+    myMux16(a=out1,b=out2,sel=sel[1],out=out);
+}
