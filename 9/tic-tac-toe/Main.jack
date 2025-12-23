@@ -1,0 +1,38 @@
+class Main{
+    function void main(){
+        var arr game;
+        var int i,k;
+        var int in;
+        var int f;
+        let game=arr.new(3,3);
+        do game.draw();
+        let i=0;
+        let k=0;
+        while(i<9){
+            do Output.moveCursor(0,0);
+            if(k=0){
+                let in=Keyboard.readInt("Player 1(circle):    ");
+            }
+            else{
+                let in=Keyboard.readInt("Player 2(rectangle): ");
+            }
+            do game.draw1(in,k);
+            let f=game.check();
+            if(f=1){
+                do Output.moveCursor(0,0);
+                if(k=0){
+                    do Output.printString("Player 1 Wins!           ");
+                }
+                else{
+                    do Output.printString("Player 2 wins!           ");
+                }
+                return;
+            }
+            let k=1-k;
+            let i=i+1;
+        }
+        do Output.moveCursor(0,0);
+        do Output.printString("Tie GameOver!           ");
+        return;
+    }
+}

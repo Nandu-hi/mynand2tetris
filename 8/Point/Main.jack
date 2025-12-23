@@ -1,0 +1,14 @@
+class Main{
+    function void main(){
+        var point p1;
+        var point p2;
+        var int a;
+        let p1=point.new(1,2);
+        let p2=p1.plus(p1);
+        do p2.print();
+        let a=point.getpointCount();
+        do Output.printInt(a);
+        do Output.println();
+        return;
+    }
+}
