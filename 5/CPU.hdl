@@ -1,0 +1,60 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+ 
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	//// Replace this comment with your code.	
+myALU(x=alux,y=aluy,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=aluout,out=outM,ng=aluneg,zr=aluzr);
+DRegister(in=aluout,load=dregload,out=alux);
+	myMux16(a=instruction,b=aluout,sel=instruction[15],out=aregin);
+	myNot(in=instruction[15],out=negT);
+	myOr(a=negT,b=instruction[5],out=loadareg);
+	ARegister(in=aregin,load=loadareg,out=aout,out[0..14]=addressM);
+	myMux16(a=aout,b=inM,sel=instruction[12],out=aluy);
+	myAnd(a=instruction[15],b=instruction[4],out=dregload);
+	myAnd(a=instruction[15],b=instruction[3],out=writeM);
+	myAnd(a=instruction[0],b=instruction[1],out=mid1);
+	myAnd(a=mid1,b=instruction[2],out=out1);
+	myNot(in=aluzr,out=negzr);
+	myNot(in=aluneg,out=negng);
+	myAnd(a=instruction[0],b=negzr,out=mid2);
+	myAnd(a=mid2,b=negng,out=out2);
+	myAnd(a=instruction[2],b=aluneg,out=out3);
+	myAnd(a=instruction[1],b=aluzr,out=out4);
+	myOr(a=out1,b=out2,out=out100);
+	myOr(a=out3,b=out4,out=out110);
+	myOr(a=out100,b=out110,out=out101);
+	myAnd(a=instruction[15],b=out101,out=pcload);
+	myNot(in=pcload,out=pcinc);
+	PC(reset=reset,load=pcload,inc=pcinc,in=aout,out[0..14]=pc);
+}
